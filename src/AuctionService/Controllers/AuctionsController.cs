@@ -1,7 +1,9 @@
+using System.Net.Quic;
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,15 +22,32 @@ public class AuctionsController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<AuctionDTO>>> GetAllActions()
-    {
-        var auctions = await _context.Auctions
-            .Include(x => x.Item)
-            .OrderBy(x => x.Item.Make)
-            .ToListAsync();
 
-        return _mapper.Map<List<AuctionDTO>>(auctions);
+    // date 為 querystring 因此型別為string，若有date則query在date之後的auctions
+    [HttpGet]
+    public async Task<ActionResult<List<AuctionDTO>>> GetAllActions(string? date)
+    {
+        // 加上 .AsQueryable() 為了進一步query
+        var query = _context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
+
+        if (!string.IsNullOrEmpty(date))
+        {
+            // Datetime.CompareTo()
+            // < 0 : UpdatedAt 早於 date
+            // == 0 : 相等
+            // > 0 : UpdatedAt 晚於 date
+            query = query.Where(x => x.UpdatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
+        }
+
+        return await query.ProjectTo<AuctionDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+
+        // var auctions = await _context.Auctions
+        //     .Include(x => x.Item)
+        //     .OrderBy(x => x.Item.Make)
+        //     .ToListAsync();
+
+        // return _mapper.Map<List<AuctionDTO>>(auctions);
     }
 
     [HttpGet("{id}")]
