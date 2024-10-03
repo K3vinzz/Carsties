@@ -74,7 +74,6 @@ public class AuctionsController : ControllerBase
     {
         var auction = _mapper.Map<Auction>(auctionDto);
 
-        // TODO: add current user as seller
         // options.TokenValidationParameters.NameClaimType = "username";
         // User.Identity.Name為username
         auction.Seller = User.Identity.Name;

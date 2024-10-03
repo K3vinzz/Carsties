@@ -18,6 +18,7 @@ public class SeedData
 
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
+        // 若有user則不seed data
         if (userMgr.Users.Any()) return;
 
         var alice = userMgr.FindByNameAsync("alice").Result;
@@ -35,6 +36,7 @@ public class SeedData
                 throw new Exception(result.Errors.First().Description);
             }
 
+            // claim: What users say about themselves
             result = userMgr.AddClaimsAsync(alice, new Claim[]{
                             new Claim(JwtClaimTypes.Name, "Alice Smith"),
                         }).Result;
