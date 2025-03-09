@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AuctionService.IntegrationTests;
 
-// IClassFixture<CustomWebAppFactory> : 用於share CustomWebAppFactory，已達到share postgres container, MassTransit
+// IClassFixture<CustomWebAppFactory> : 用於share CustomWebAppFactory，以達到share postgres container, MassTransit
 // IAsyncLifetime :  InitializeAsync會在每個Test前執行，DisposeAsync會在每個Test後執行
 [Collection("Shared collection")]
 public class AuctionControllerTests : IAsyncLifetime
